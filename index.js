@@ -15,15 +15,14 @@ app.get("/", function(req, res) {
 app.post("/", function(req, res) {
     
     // takes in the zip from the html form, display in // console. Takes in as string, ex. for zip 02139
-        var zip = String(req.body.zipInput);
-        console.log(req.body.zipInput);
+        var cityName = String(req.body.cityNameInput);
+        console.log(req.body.cityInput);
     
-    //build up the URL for the JSON query, API Key is // secret and needs to be obtained by signup 
+        
         const units = "imperial";
-        const apiKey = "67f6b382921c1e89b39b20d4f9556f22";
-        const url = "https://api.openweathermap.org/data/2.5/weather?zip=" + zip +  "&units=" + units + "&APPID=" + apiKey;
-    
-    // this gets the data from Open WeatherPI
+        const apiKey = "0c258df830517dcb0bb96a6a5d8bad3e";
+        const url = "https://api.openweathermap.org/data/2.5/weather?q=" + city + "&units=" + units + "&APPID=" + apiKey; // Build the URL for the JSON query
+     // this gets the data from Open WeatherPI
     https.get(url, function(response){
         console.log(response.statusCode);
         
@@ -31,15 +30,31 @@ app.post("/", function(req, res) {
         response.on("data", function(data){
             const weatherData = JSON.parse(data);
             const temp = weatherData.main.temp;
+            const feelsLike = weatherData.main.feels_like;
+            const humidity = weatherData.main.humidity;
+            const windSpeed = weatherData.wind.speed;
+            const windGust = weatherData.wind.gust;
+            const sunrise = weatherData.sys.sunrise;
+            const sunset = weatherData.sys.sunset;
             const city = weatherData.name;
             const weatherDescription = weatherData.weather[0].description;
             const icon = weatherData.weather[0].icon;
             const imageURL = "http://openweathermap.org/img/wn/" + icon + "@2x.png";
+
+            
+            
+            
             
             // displays the output of the results
-            res.write("<h1> The weather is " + weatherDescription + "<h1>");
-            res.write("<h2>The Temperature in " + city + " " + zip + " is " + temp + " Degrees Fahrenheit<h2>");
+            res.write("<h1>The weather in " + city + " is " + weatherDescription);
             res.write("<img src=" + imageURL +">");
+            res.write("<h2>Temperature: " + temp.toFixed(1) + " Degrees Fahrenheit");
+            res.write("<h3>Feels Like : " + feelsLike.toFixed(1) + " Degrees Fahrenheit");
+            res.write("<h4>Humidity: " + humidity + "%");
+            res.write("<h4>Wind Speed: " + windSpeed.toFixed(1) + " miles/hour");
+            res.write("<h4>Wind Gust: " + windGust + " miles/hour");
+            res.write("<h4>Sunrise: " + sunrise);
+            res.write("<h4>Sunset: " + sunset);
             res.send();
         });
     });
