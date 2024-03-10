@@ -13,55 +13,32 @@ app.get("/", function(req, res) {
 
 //invoked after hitting go in the html form
 app.post("/", function(req, res) {
-    
-    // takes in the zip from the html form, display in // console. Takes in as string, ex. for zip 02139
-        var cityName = String(req.body.cityNameInput);
-        console.log(req.body.cityInput);
-    
-        
-        const units = "imperial";
-        const apiKey = "0c258df830517dcb0bb96a6a5d8bad3e";
-        const url = "https://api.openweathermap.org/data/2.5/weather?q=" + city + "&units=" + units + "&APPID=" + apiKey; // Build the URL for the JSON query
-     // this gets the data from Open WeatherPI
+
+    const latitude = req.body.latitude;
+    const longitude = req.body.longitude;
+    const units = "imperial";
+    const apiKey = "0c258df830517dcb0bb96a6a5d8bad3e";
+    const url = `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&units=${units}&APPID=${apiKey}`;
     https.get(url, function(response){
         console.log(response.statusCode);
-        
-        // gets individual items from Open Weather API
+
         response.on("data", function(data){
             const weatherData = JSON.parse(data);
             const temp = weatherData.main.temp;
-            const feelsLike = weatherData.main.feels_like;
             const humidity = weatherData.main.humidity;
             const windSpeed = weatherData.wind.speed;
-            const windGust = weatherData.wind.gust;
-            const sunrise = weatherData.sys.sunrise;
-            const sunset = weatherData.sys.sunset;
-            const city = weatherData.name;
+            const cloudiness = weatherData.clouds.all;
             const weatherDescription = weatherData.weather[0].description;
             const icon = weatherData.weather[0].icon;
-            const imageURL = "http://openweathermap.org/img/wn/" + icon + "@2x.png";
-
-            
-            
-            
-            
-            // displays the output of the results
-            res.write("<h1>The weather in " + city + " is " + weatherDescription);
-            res.write("<img src=" + imageURL +">");
-            res.write("<h2>Temperature: " + temp.toFixed(1) + " Degrees Fahrenheit");
-            res.write("<h3>Feels Like : " + feelsLike.toFixed(1) + " Degrees Fahrenheit");
-            res.write("<h4>Humidity: " + humidity + "%");
-            res.write("<h4>Wind Speed: " + windSpeed.toFixed(1) + " miles/hour");
-            res.write("<h4>Wind Gust: " + windGust + " miles/hour");
-            res.write("<h4>Sunrise: " + sunrise);
-            res.write("<h4>Sunset: " + sunset);
+            const imageURL = `http://openweathermap.org/img/wn/${icon}.png`;
+            res.write("<h1>Weather Information</h1>");
+            res.write("<h2>Description: " + weatherDescription);
+            res.write(`<img src="${imageURL}">`);
+            res.write("<h2>Temperature: " + temp.toFixed(1) + "°F");
+            res.write("<h3>Humidity: " + humidity + "%");
+            res.write("<h3>Wind Speed: " + windSpeed.toFixed(1) + " mph");
+            res.write("<h3>Cloudiness: " + cloudiness + "%");
             res.send();
         });
     });
-})
-
-
-//Code will run on 3000 or any available open port
-app.listen(process.env.PORT || 3000, function() {
-console.log ("Server is running on port")
 });
